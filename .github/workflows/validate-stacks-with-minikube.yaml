@@ -29,8 +29,8 @@ env:
   KUBERNETES_VERSION: 'v1.25.2'
 
 jobs:
-
   validate_with_minikube:
+    # All checks that use minikube are in the same job, to save time on downloading the images.
     name: Validate Devfiles on minikube
     runs-on: ubuntu-latest
     steps:
@@ -64,7 +64,8 @@ jobs:
       run: tests/check_with_odov3.sh
     - name: Remove odo v3 before installing v2
       run: rm $(go env GOPATH)/odo
-    - name: Install CLI tools
+
+    - name: Install odo v2
       uses: redhat-actions/openshift-tools-installer@v1
       with:
         odo: "2.5.1"
