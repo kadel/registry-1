@@ -29,6 +29,7 @@ env:
 
 jobs:
   minikube:
+    # SETUP
     name: check for non-terminating images
     runs-on: ubuntu-latest
     steps:
@@ -43,24 +44,11 @@ jobs:
         github token: ${{ secrets.GITHUB_TOKEN }}
         start args: '--addons=ingress'
 
+    # CHECK NON-TERMINATING
     - name: Check that containers components are non terminating
       run: tests/check_non_terminating.sh
 
-  odov3:
-    name: with odo v3
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v1
-    - name: Setup Minikube
-      uses: manusa/actions-setup-minikube@v2.7.0
-      with:
-        minikube version: ${{ env.MINIKUBE_VERSION }}
-        kubernetes version: ${{ env.KUBERNETES_VERSION }}
-        driver: 'docker'
-        github token: ${{ secrets.GITHUB_TOKEN }}
-        start args: '--addons=ingress'
-
+    # CHECK WITH ODO V3
     - name: Install Go
       uses: actions/setup-go@v3
       with:
@@ -76,30 +64,18 @@ jobs:
       run: go install -mod=mod github.com/onsi/ginkgo/v2/ginkgo
     - name: Check odo version
       run: odo version
-    - name: Check the devfile stacks with odo v3
+    - name: Check devfile stacks with odo v3
       run: tests/check_odov3.sh
+    - name: Uninstall odo v3
+      run: rm  $(go env GOPATH)/bin/odo
 
-  odov2:
-    name: with odo v3
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v1
-    - name: Setup Minikube
-      uses: manusa/actions-setup-minikube@v2.7.0
-      with:
-        minikube version: ${{ env.MINIKUBE_VERSION }}
-        kubernetes version: ${{ env.KUBERNETES_VERSION }}
-        driver: 'docker'
-        github token: ${{ secrets.GITHUB_TOKEN }}
-        start args: '--addons=ingress'
-
+    # CHECK WITH ODO v2
     - name: Install odo v2
       uses: redhat-actions/openshift-tools-installer@v1
       with:
         odo: "2.5.1"
     - name: Check odo version
       run: odo version
-    - name: Check the devfile stacks with odo v2
+    - name: Check devfile stacks with odo v2
       run: tests/check_odov2.sh odo
 
